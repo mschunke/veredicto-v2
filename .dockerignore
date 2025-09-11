@@ -54,3 +54,6 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+
+# Exclude functions folder from Next.js build
+functions/
