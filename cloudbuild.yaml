@@ -18,6 +18,7 @@ steps:
       - "api"
       - "--project"
       - "$PROJECT_ID"
+    secretEnv: ['GEMINI_API_KEY', 'MONGO_URI']
     waitFor: ["-"]
 
   # Build and Deploy Next.js App
@@ -31,6 +32,7 @@ steps:
     id: "build-next-app"
     entrypoint: "npm"
     args: ["run", "build"]
+    secretEnv: ['NEXT_PUBLIC_BASE_URL', 'MONGO_URI', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL']
     waitFor:
       - "npm-install"
 
