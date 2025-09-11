@@ -4,10 +4,8 @@ steps:
     id: 'build-nextjs'
     args:
       - 'build'
-      - '-t'
-      - 'gcr.io/veredicto-ai/veredicto-nextjs:$SHORT_SHA'
-      - '-t'
-      - 'gcr.io/veredicto-ai/veredicto-nextjs:latest'
+  - '-t'
+  - 'gcr.io/veredicto-ai/veredicto-nextjs:latest'
       - '.'
 
   # Optional safe debug step: checks whether MONGO_URI is available when requested
@@ -30,10 +28,8 @@ steps:
     id: 'build-functions'
     args:
       - 'build'
-      - '-t'
-      - 'gcr.io/veredicto-ai/veredicto-functions:$SHORT_SHA'
-      - '-t'
-      - 'gcr.io/veredicto-ai/veredicto-functions:latest'
+  - '-t'
+  - 'gcr.io/veredicto-ai/veredicto-functions:latest'
       - './functions'
 
   # Step 3: Push Next.js image
@@ -63,7 +59,7 @@ steps:
       - '-c'
       - |
         gcloud run deploy veredicto-nextjs \
-          --image=gcr.io/veredicto-ai/veredicto-nextjs:$SHORT_SHA \
+          --image=gcr.io/veredicto-ai/veredicto-nextjs:latest \
           --region=us-east1 \
           --platform=managed \
           --allow-unauthenticated \
@@ -88,7 +84,7 @@ steps:
       - '-c'
       - |
         gcloud run deploy veredicto-functions \
-          --image=gcr.io/veredicto-ai/veredicto-functions:$SHORT_SHA \
+          --image=gcr.io/veredicto-ai/veredicto-functions:latest \
           --region=us-east1 \
           --platform=managed \
           --allow-unauthenticated \
