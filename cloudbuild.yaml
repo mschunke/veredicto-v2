@@ -2,30 +2,28 @@ steps:
   # Step 1: Build Next.js app Docker image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-nextjs'
-    secretEnv: ['MONGO_URI', 'GEMINI_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY']
     args:
       - 'build'
-      - '--build-arg'
-      - 'MONGO_URI=$$MONGO_URI'
-      - '--build-arg'
-      - 'GEMINI_API_KEY=$$GEMINI_API_KEY'
-      - '--build-arg'
-      - 'BETTER_AUTH_SECRET=$$BETTER_AUTH_SECRET'
-      - '--build-arg'
-      - 'BETTER_AUTH_URL=$$BETTER_AUTH_URL'
-      - '--build-arg'
-      - 'STRIPE_SECRET=$$STRIPE_SECRET'
-      - '--build-arg'
-      - 'STRIPE_WH_SECRET=$$STRIPE_WH_SECRET'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_STRIPE_PK=$$NEXT_PUBLIC_STRIPE_PK'
-      - '--build-arg'
-      - 'BREVO_API_KEY=$$BREVO_API_KEY'
       - '-t'
       - 'gcr.io/veredicto-ai/veredicto-nextjs:$SHORT_SHA'
       - '-t'
       - 'gcr.io/veredicto-ai/veredicto-nextjs:latest'
       - '.'
+
+  # Optional safe debug step: checks whether MONGO_URI is available when requested
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
+    id: 'debug-build-secrets'
+    secretEnv: ['MONGO_URI']
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [ -z "$MONGO_URI" ]; then
+          echo "MONGO_URI is NOT present in this build step"
+          # Do not exit non-zero by default — keep this optional; change to 'exit 1' if you want strictly failing behavior
+        else
+          echo "MONGO_URI is present (value redacted)"
+        fi
 
   # Step 2: Build Functions Docker image
   - name: 'gcr.io/cloud-builders/docker'
