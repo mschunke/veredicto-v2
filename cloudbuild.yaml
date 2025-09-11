@@ -32,7 +32,7 @@ steps:
     id: "build-next-app"
     entrypoint: "npm"
     args: ["run", "build"]
-    secretEnv: ['NEXT_PUBLIC_BASE_URL', 'MONGO_URI', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL']
+    secretEnv: ["GEMINI_API_KEY",'NEXT_PUBLIC_BASE_URL', 'MONGO_URI', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL']
     waitFor:
       - "npm-install"
 
@@ -58,21 +58,21 @@ options:
 
 availableSecrets:
   secretManager:
-    - versionName: "projects/537799247600/secrets/GEMINI_API_KEY/versions/lastest"
+    - versionName: "projects/537799247600/secrets/GEMINI_API_KEY/versions/latest"
       env: "GEMINI_API_KEY"
-    - versionName: "projects/537799247600/secrets/NEXT_PUBLIC_BASE_URL/versions/lastest"
+    - versionName: "projects/537799247600/secrets/NEXT_PUBLIC_BASE_URL/versions/latest"
       env: "NEXT_PUBLIC_BASE_URL"
-    - versionName: "projects/537799247600/secrets/MONGO_URI/versions/lastest"
+    - versionName: "projects/537799247600/secrets/MONGO_URI/versions/latest"
       env: "MONGO_URI"
-    - versionName: "projects/537799247600/secrets/STRIPE_SECRET/versions/lastest"
+    - versionName: "projects/537799247600/secrets/STRIPE_SECRET/versions/latest"
       env: "STRIPE_SECRET"
-    - versionName: "projects/537799247600/secrets/STRIPE_WH_SECRET/versions/lastest"
+    - versionName: "projects/537799247600/secrets/STRIPE_WH_SECRET/versions/latest"
       env: "STRIPE_WH_SECRET"
-    - versionName: "projects/537799247600/secrets/NEXT_PUBLIC_STRIPE_PK/versions/lastest"
+    - versionName: "projects/537799247600/secrets/NEXT_PUBLIC_STRIPE_PK/versions/latest"
       env: "NEXT_PUBLIC_STRIPE_PK"
-    - versionName: "projects/537799247600/secrets/BREVO_API_KEY/versions/lastest"
+    - versionName: "projects/537799247600/secrets/BREVO_API_KEY/versions/latest"
       env: "BREVO_API_KEY"
-    - versionName: "projects/537799247600/secrets/BETTER_AUTH_SECRET/versions/lastest"
+    - versionName: "projects/537799247600/secrets/BETTER_AUTH_SECRET/versions/latest"
       env: "BETTER_AUTH_SECRET"
-    - versionName: "projects/537799247600/secrets/BETTER_AUTH_URL/versions/lastest"
+    - versionName: "projects/537799247600/secrets/BETTER_AUTH_URL/versions/latest"
       env: "BETTER_AUTH_URL"
