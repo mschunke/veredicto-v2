@@ -28,8 +28,8 @@ steps:
     id: 'build-functions'
     args:
       - 'build'
-  - '-t'
-  - 'gcr.io/veredicto-ai/veredicto-functions:latest'
+      - '-t'
+      - 'gcr.io/veredicto-ai/veredicto-functions:latest'
       - './functions'
 
   # Step 3: Push Next.js image
