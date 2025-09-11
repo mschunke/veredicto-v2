@@ -3,22 +3,27 @@ steps:
   - name: "gcr.io/cloud-builders/gcloud"
     id: "deploy-function"
     args:
-      - "run"
+      - "functions"
       - "deploy"
       - "veredito-function"
       - "--source"
       - "./functions"
-      - "--region"
-      - "us-east1"
+      - "--runtime"
+      - "nodejs20"
       - "--trigger-http"
       - "--allow-unauthenticated"
+      - "--region"
+      - "us-east1"
+      - "--entry-point"
+      - "api"
       - "--project"
       - "$PROJECT_ID"
     waitFor: ["-"]
 
   # Build and Deploy Next.js App
-  - name: "gcr.io/cloud-builders/npm"
+  - name: "node:20"
     id: "npm-install"
+    entrypoint: "npm"
     args: ["install"]
     waitFor: ["-"]
 
@@ -32,8 +37,9 @@ steps:
     waitFor:
       - "npm-install"
 
-  - name: "gcr.io/cloud-builders/npm"
+  - name: "node:20"
     id: "build-next-app"
+    entrypoint: "npm"
     args: ["run", "build"]
     waitFor:
       - "get-secrets"
