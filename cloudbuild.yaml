@@ -31,27 +31,6 @@ steps:
     id: "build-next-app"
     entrypoint: "npm"
     args: ["run", "build"]
-    availableSecrets:
-      secretManager:
-        - versionName: "projects/veredicto-v2/secrets/GEMINI_API_KEY/versions/1"
-          env: "GEMINI_API_KEY"
-        - versionName: "projects/veredicto-v2/secrets/NEXT_PUBLIC_BASE_URL/versions/1"
-          env: "NEXT_PUBLIC_BASE_URL"
-        - versionName: "projects/veredicto-v2/secrets/MONGO_URI/versions/1"
-          env: "MONGO_URI"
-        - versionName: "projects/veredicto-v2/secrets/STRIPE_SECRET/versions/1"
-          env: "STRIPE_SECRET"
-        - versionName: "projects/veredicto-v2/secrets/STRIPE_WH_SECRET/versions/1"
-          env: "STRIPE_WH_SECRET"
-        - versionName: "projects/veredicto-v2/secrets/NEXT_PUBLIC_STRIPE_PK/versions/1"
-          env: "NEXT_PUBLIC_STRIPE_PK"
-        - versionName: "projects/veredicto-v2/secrets/BREVO_API_KEY/versions/1"
-          env: "BREVO_API_KEY"
-        - versionName: "projects/veredicto-v2/secrets/BETTER_AUTH_SECRET/versions/1"
-          env: "BETTER_AUTH_SECRET"
-        - versionName: "projects/veredicto-v2/secrets/BETTER_AUTH_URL/versions/1"
-          env: "BETTER_AUTH_URL"
-
     waitFor:
       - "npm-install"
 
@@ -74,3 +53,24 @@ steps:
 
 options:
   logging: CLOUD_LOGGING_ONLY
+
+availableSecrets:
+  secretManager:
+    - versionName: "projects/veredicto-v2/secrets/GEMINI_API_KEY/versions/1"
+      env: "GEMINI_API_KEY"
+    - versionName: "projects/veredicto-v2/secrets/NEXT_PUBLIC_BASE_URL/versions/1"
+      env: "NEXT_PUBLIC_BASE_URL"
+    - versionName: "projects/veredicto-v2/secrets/MONGO_URI/versions/1"
+      env: "MONGO_URI"
+    - versionName: "projects/veredicto-v2/secrets/STRIPE_SECRET/versions/1"
+      env: "STRIPE_SECRET"
+    - versionName: "projects/veredicto-v2/secrets/STRIPE_WH_SECRET/versions/1"
+      env: "STRIPE_WH_SECRET"
+    - versionName: "projects/veredicto-v2/secrets/NEXT_PUBLIC_STRIPE_PK/versions/1"
+      env: "NEXT_PUBLIC_STRIPE_PK"
+    - versionName: "projects/veredicto-v2/secrets/BREVO_API_KEY/versions/1"
+      env: "BREVO_API_KEY"
+    - versionName: "projects/veredicto-v2/secrets/BETTER_AUTH_SECRET/versions/1"
+      env: "BETTER_AUTH_SECRET"
+    - versionName: "projects/veredicto-v2/secrets/BETTER_AUTH_URL/versions/1"
+      env: "BETTER_AUTH_URL"
