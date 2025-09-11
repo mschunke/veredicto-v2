@@ -3,10 +3,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# TypeScript source files (we only need the compiled dist/)
-src/
-tsconfig.json
-*.ts
+# TypeScript source files are needed for Docker build
+# src/
+# tsconfig.json
+# *.ts
 
 # Development dependencies
 .git

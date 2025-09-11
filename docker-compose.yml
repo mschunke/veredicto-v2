@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  nextjs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - MONGO_URI
+        - GEMINI_API_KEY
+        - BETTER_AUTH_SECRET
+        - BETTER_AUTH_URL
+        - STRIPE_SECRET
+        - STRIPE_WH_SECRET
+        - NEXT_PUBLIC_STRIPE_PK
+        - BREVO_API_KEY
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # Override the base URL for Docker network communication
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3000
+      # Cloud functions URL for internal communication
+      - FUNCTIONS_URL=http://cloud-functions:8080
+    env_file:
+      - .env.local
+    networks:
+      - veredicto-network
+    depends_on:
+      - cloud-functions
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  cloud-functions:
+    build:
+      context: ./functions
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      # For communication with Next.js app
+      - NEXT_PUBLIC_BASE_URL=http://nextjs-app:3000
+    env_file:
+      - ./functions/.env.local
+    networks:
+      - veredicto-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  veredicto-network:
+    driver: bridge
+
+# Optional: Add volumes for development
+# volumes:
+#   nextjs_node_modules:
+#   functions_node_modules:
