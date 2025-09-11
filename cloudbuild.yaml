@@ -4,8 +4,8 @@ steps:
     id: 'build-nextjs'
     args:
       - 'build'
-  - '-t'
-  - 'gcr.io/veredicto-ai/veredicto-nextjs:latest'
+      - '-t'
+      - 'gcr.io/veredicto-ai/veredicto-nextjs:latest'
       - '.'
 
   # Optional safe debug step: checks whether MONGO_URI is available when requested
