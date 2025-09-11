@@ -1,0 +1,141 @@
+steps:
+  # Step 1: Build Next.js app Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-nextjs'
+    secretEnv: ['MONGO_URI', 'GEMINI_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY']
+    args:
+      - 'build'
+      - '--build-arg'
+      - 'MONGO_URI=$$MONGO_URI'
+      - '--build-arg'
+      - 'GEMINI_API_KEY=$$GEMINI_API_KEY'
+      - '--build-arg'
+      - 'BETTER_AUTH_SECRET=$$BETTER_AUTH_SECRET'
+      - '--build-arg'
+      - 'BETTER_AUTH_URL=$$BETTER_AUTH_URL'
+      - '--build-arg'
+      - 'STRIPE_SECRET=$$STRIPE_SECRET'
+      - '--build-arg'
+      - 'STRIPE_WH_SECRET=$$STRIPE_WH_SECRET'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_STRIPE_PK=$$NEXT_PUBLIC_STRIPE_PK'
+      - '--build-arg'
+      - 'BREVO_API_KEY=$$BREVO_API_KEY'
+      - '-t'
+      - 'gcr.io/veredicto-ai/veredicto-nextjs:$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/veredicto-ai/veredicto-nextjs:latest'
+      - '.'
+
+  # Step 2: Build Functions Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-functions'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/veredicto-ai/veredicto-functions:$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/veredicto-ai/veredicto-functions:latest'
+      - './functions'
+
+  # Step 3: Push Next.js image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-nextjs'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'gcr.io/veredicto-ai/veredicto-nextjs'
+    waitFor: ['build-nextjs']
+
+  # Step 4: Push Functions image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-functions'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'gcr.io/veredicto-ai/veredicto-functions'
+    waitFor: ['build-functions']
+
+  # Step 5: Deploy Next.js app to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
+    id: 'deploy-nextjs'
+    secretEnv: ['MONGO_URI', 'GEMINI_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY']
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud run deploy veredicto-nextjs \
+          --image=gcr.io/veredicto-ai/veredicto-nextjs:$SHORT_SHA \
+          --region=us-east1 \
+          --platform=managed \
+          --allow-unauthenticated \
+          --memory=1Gi \
+          --cpu=1 \
+          --max-instances=10 \
+          --min-instances=0 \
+          --concurrency=80 \
+          --timeout=300 \
+          --port=3000 \
+          --set-env-vars="NODE_ENV=production,PORT=3000" \
+          --set-secrets="MONGO_URI=MONGO_URI:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest,BETTER_AUTH_SECRET=BETTER_AUTH_SECRET:latest,BETTER_AUTH_URL=BETTER_AUTH_URL:latest,STRIPE_SECRET=STRIPE_SECRET:latest,STRIPE_WH_SECRET=STRIPE_WH_SECRET:latest,NEXT_PUBLIC_STRIPE_PK=NEXT_PUBLIC_STRIPE_PK:latest,BREVO_API_KEY=BREVO_API_KEY:latest" \
+          --labels="app=veredicto,component=nextjs,environment=production"
+    waitFor: ['push-nextjs']
+
+  # Step 6: Deploy Functions to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
+    id: 'deploy-functions'
+    secretEnv: ['GEMINI_API_KEY', 'MONGO_URI', 'BREVO_API_KEY', 'NEXT_PUBLIC_BASE_URL']
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud run deploy veredicto-functions \
+          --image=gcr.io/veredicto-ai/veredicto-functions:$SHORT_SHA \
+          --region=us-east1 \
+          --platform=managed \
+          --allow-unauthenticated \
+          --memory=512Mi \
+          --cpu=1 \
+          --max-instances=10 \
+          --min-instances=0 \
+          --concurrency=80 \
+          --timeout=300 \
+          --port=8080 \
+          --set-env-vars="NODE_ENV=production,PORT=8080" \
+          --set-secrets="GEMINI_API_KEY=GEMINI_API_KEY:latest,MONGO_URI=MONGO_URI:latest,BREVO_API_KEY=BREVO_API_KEY:latest,NEXT_PUBLIC_BASE_URL=NEXT_PUBLIC_BASE_URL:latest" \
+          --labels="app=veredicto,component=functions,environment=production"
+    waitFor: ['push-functions']
+
+# Build timeout (20 minutes)
+timeout: '1200s'
+
+# Available secrets from Google Secret Manager
+availableSecrets:
+  secretManager:
+    # Next.js secrets
+    - versionName: projects/veredicto-ai/secrets/MONGO_URI/versions/latest
+      env: 'MONGO_URI'
+    - versionName: projects/veredicto-ai/secrets/GEMINI_API_KEY/versions/latest
+      env: 'GEMINI_API_KEY'
+    - versionName: projects/veredicto-ai/secrets/BETTER_AUTH_SECRET/versions/latest
+      env: 'BETTER_AUTH_SECRET'
+    - versionName: projects/veredicto-ai/secrets/BETTER_AUTH_URL/versions/latest
+      env: 'BETTER_AUTH_URL'
+    - versionName: projects/veredicto-ai/secrets/STRIPE_SECRET/versions/latest
+      env: 'STRIPE_SECRET'
+    - versionName: projects/veredicto-ai/secrets/STRIPE_WH_SECRET/versions/latest
+      env: 'STRIPE_WH_SECRET'
+    - versionName: projects/veredicto-ai/secrets/NEXT_PUBLIC_STRIPE_PK/versions/latest
+      env: 'NEXT_PUBLIC_STRIPE_PK'
+    - versionName: projects/veredicto-ai/secrets/BREVO_API_KEY/versions/latest
+      env: 'BREVO_API_KEY'
+    # Functions secrets
+    - versionName: projects/veredicto-ai/secrets/NEXT_PUBLIC_BASE_URL/versions/latest
+      env: 'NEXT_PUBLIC_BASE_URL'
+
+# Build options
+options:
+  logging: CLOUD_LOGGING_ONLY
+  logStreamingOption: STREAM_ON
+  machineType: 'E2_HIGHCPU_8'
+  substitutionOption: 'ALLOW_LOOSE'
