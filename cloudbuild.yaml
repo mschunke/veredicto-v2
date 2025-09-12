@@ -35,7 +35,7 @@ steps:
     waitFor:
       - "deploy-function"
 
-  # Deploy the pre-built image to Cloud Run
+  # Deploy the pre-built image to Cloud Run, attaching runtime secrets
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "deploy-next-app"
     entrypoint: "gcloud"
@@ -50,6 +50,8 @@ steps:
       - "--allow-unauthenticated"
       - "--project"
       - "$PROJECT_ID"
+      - "--set-secrets"
+      - "GEMINI_API_KEY=GEMINI_API_KEY:latest,NEXT_PUBLIC_BASE_URL=NEXT_PUBLIC_BASE_URL:latest,MONGO_URI=MONGO_URI:latest,STRIPE_SECRET=STRIPE_SECRET:latest,STRIPE_WH_SECRET=STRIPE_WH_SECRET:latest,NEXT_PUBLIC_STRIPE_PK=NEXT_PUBLIC_STRIPE_PK:latest,BREVO_API_KEY=BREVO_API_KEY:latest,BETTER_AUTH_SECRET=BETTER_AUTH_SECRET:latest,BETTER_AUTH_URL=BETTER_AUTH_URL:latest"
     waitFor:
       - "build-next-app-image"
 
