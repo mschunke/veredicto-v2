@@ -1,32 +1,37 @@
-# This Dockerfile is for packaging the pre-built application.
-# The `npm run build` command is executed in cloudbuild.yaml, not here.
+# 1. Builder
+FROM node:20-slim AS builder
+WORKDIR /app
 
-# 1. Runner Stage - The final, lean image
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# Set NEXT_TELEMETRY_DISABLED to 1 to disable telemetry during build
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build the Next.js application
+RUN npm run build
+
+# 2. Runner
 FROM node:20-slim AS runner
 WORKDIR /app
 
-# Set production environment
-ENV NODE_ENV=production
-# Disable Next.js telemetry
+# Set NEXT_TELEMETRY_DISABLED to 1 to disable telemetry in production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 
-# Create a non-root user for security
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# Copy the pre-built standalone output, which includes node_modules
-COPY --from=builder /app/.next/standalone ./
-# Copy the pre-built static assets
-COPY --from=builder /app/.next/static ./.next/static
-# Copy public assets
+# Copy the standalone server and public assets
 COPY --from=builder /app/public ./public
-
-# Change ownership to the non-root user
-USER nextjs
+COPY --from=builder --chown=node:node /app/.next/standalone ./
+COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 
 # Expose the port the app runs on
 EXPOSE 3000
 
-# Define the command to run the application from the standalone output
+# Define the command to run the application
+# The server is started from the server.js file in the standalone output
 CMD ["node", "server.js"]
 
