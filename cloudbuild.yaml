@@ -1,15 +1,21 @@
 steps:
-# Install dependencies for the Next.js app
+  # Install dependencies for the Next.js app using Node.js 20
   - name: 'node:20'
     id: 'npm-install'
-    args: ['install']
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'npm ci'
     waitFor:
-      - "deploy-function"
+      - "-" # Assuming this is now the first step for the app
 
-  # Build the Next.js app with secrets
+  # Build the Next.js app with secrets using Node.js 20
   - name: 'node:20'
     id: 'npm-build'
-    args: ['run', 'build']
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'npm run build'
     secretEnv: ["GEMINI_API_KEY",'NEXT_PUBLIC_BASE_URL', 'MONGO_URI', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL']
     waitFor:
       - 'npm-install'
