@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "functions": "npm --prefix ./functions run dev",
+    "docker:build": "docker build -t veredicto-v2 .",
     "build": "next build",
     "start": "next start",
     "lint": "biome check",

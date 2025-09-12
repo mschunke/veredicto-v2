@@ -10,7 +10,7 @@ RUN npm install
 COPY . .
 
 # Set NEXT_TELEMETRY_DISABLED to 1 to disable telemetry during build
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Build the Next.js application
 RUN npm run build
@@ -20,8 +20,8 @@ FROM node:20-slim AS runner
 WORKDIR /app
 
 # Set NEXT_TELEMETRY_DISABLED to 1 to disable telemetry in production
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 
 # Copy the standalone server and public assets
 COPY --from=builder /app/public ./public
