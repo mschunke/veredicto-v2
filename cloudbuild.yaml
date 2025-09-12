@@ -23,14 +23,14 @@ steps:
       - "-"
 
 # Install dependencies for the Next.js app
-  - name: 'gcr.io/cloud-builders/npm'
+  - name: 'node:20'
     id: 'npm-install'
     args: ['install']
     waitFor:
       - "deploy-function"
 
   # Build the Next.js app with secrets
-  - name: 'gcr.io/cloud-builders/npm'
+  - name: 'node:20'
     id: 'npm-build'
     args: ['run', 'build']
     secretEnv: ["GEMINI_API_KEY",'NEXT_PUBLIC_BASE_URL', 'MONGO_URI', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL']
