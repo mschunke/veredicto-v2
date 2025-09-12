@@ -1,6 +1,6 @@
 "use server";
 
-import { getAuth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import type { SigninFormType } from "./signin/signinForm";
 import type { SignupFormType } from "./signup/signupForm";
 
@@ -11,7 +11,6 @@ export async function signUp(signupForm: SignupFormType) {
     throw new Error("Email, password, and name are required");
   }
 
-  const auth = await getAuth();
   const user = await auth.api.signUpEmail({
     body: {
       email,
@@ -30,7 +29,6 @@ export async function signIn(signinForm: SigninFormType) {
     throw new Error("Email and password are required");
   }
 
-  const auth = await getAuth();
   const user = await auth.api.signInEmail({
     body: {
       email,

@@ -1,6 +1,6 @@
 import { headers as nextHeaders } from "next/headers";
 import { NextResponse } from "next/server";
-import { getAuth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 
 export async function GET() {
   const h = await nextHeaders();
@@ -11,7 +11,6 @@ export async function GET() {
   const forwardedFor = h.get("x-forwarded-for");
   const forwardedPort = h.get("x-forwarded-port");
 
-  const auth = await getAuth();
   const session = await auth.api.getSession({ headers: h });
 
   return NextResponse.json({

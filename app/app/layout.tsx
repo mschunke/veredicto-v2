@@ -1,14 +1,13 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { getAuth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const auth = await getAuth();
   const session = await auth.api.getSession({
     headers: await headers(),
   });
