@@ -107,10 +107,13 @@ app.use("*", (_req: Request, res: Response<ErrorResponse>) => {
 
 // Start the server
 const PORT: number = parseInt(process.env.PORT || "8080", 10);
-app.listen(PORT, () => {
-  console.log(`Veredicto Cloud Function listening on port ${PORT}`);
-  console.log(`Health check available at: http://localhost:${PORT}/`);
-  console.log(`Hello endpoint available at: http://localhost:${PORT}/hello`);
-});
+
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`Veredicto Cloud Function listening on port ${PORT}`);
+    console.log(`Health check available at: http://localhost:${PORT}/`);
+    console.log(`Hello endpoint available at: http://localhost:${PORT}/hello`);
+  });
+}
 
 export { app };
