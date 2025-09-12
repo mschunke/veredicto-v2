@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -41,7 +41,7 @@ const signupSchema = z
 
 export type SignupFormType = z.infer<typeof signupSchema>;
 
-export function SigninForm() {
+export function SignupForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
