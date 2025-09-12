@@ -48,8 +48,7 @@ steps:
       'gcr.io/$PROJECT_ID/veredicto-v2:$COMMIT_SHA',
       '.'
     ]
-    waitFor:
-      - '-'
+
 
   # Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
