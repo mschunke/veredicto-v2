@@ -113,4 +113,4 @@ app.listen(PORT, () => {
   console.log(`Hello endpoint available at: http://localhost:${PORT}/hello`);
 });
 
-export default app;
+export { app };
