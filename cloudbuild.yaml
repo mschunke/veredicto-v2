@@ -1,27 +1,4 @@
 steps:
-  # Deploy Cloud Function
-  - name: "gcr.io/cloud-builders/gcloud"
-    id: "deploy-function"
-    args:
-      - "functions"
-      - "deploy"
-      - "veredito-function"
-      - "--source"
-      - "./functions"
-      - "--runtime"
-      - "nodejs20"
-      - "--trigger-http"
-      - "--allow-unauthenticated"
-      - "--region"
-      - "us-east1"
-      - "--entry-point"
-      - "app"
-      - "--project"
-      - "$PROJECT_ID"
-    secretEnv: ['GEMINI_API_KEY', 'MONGO_URI']
-    waitFor:
-      - "-"
-
 # Install dependencies for the Next.js app
   - name: 'node:20'
     id: 'npm-install'
@@ -76,6 +53,29 @@ steps:
       - "GEMINI_API_KEY=GEMINI_API_KEY:latest,NEXT_PUBLIC_BASE_URL=NEXT_PUBLIC_BASE_URL:latest,MONGO_URI=MONGO_URI:latest,STRIPE_SECRET=STRIPE_SECRET:latest,STRIPE_WH_SECRET=STRIPE_WH_SECRET:latest,NEXT_PUBLIC_STRIPE_PK=NEXT_PUBLIC_STRIPE_PK:latest,BREVO_API_KEY=BREVO_API_KEY:latest,BETTER_AUTH_SECRET=BETTER_AUTH_SECRET:latest,BETTER_AUTH_URL=BETTER_AUTH_URL:latest"
     waitFor:
       - "docker-push"
+
+  # Deploy Cloud Function
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "deploy-function"
+    args:
+      - "functions"
+      - "deploy"
+      - "veredito-function"
+      - "--source"
+      - "./functions"
+      - "--runtime"
+      - "nodejs20"
+      - "--trigger-http"
+      - "--allow-unauthenticated"
+      - "--region"
+      - "us-east1"
+      - "--entry-point"
+      - "app"
+      - "--project"
+      - "$PROJECT_ID"
+    secretEnv: ['GEMINI_API_KEY', 'MONGO_URI']
+    waitFor:
+      - "-"
 
 options:
   logging: CLOUD_LOGGING_ONLY
