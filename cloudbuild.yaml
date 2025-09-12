@@ -22,7 +22,20 @@ steps:
     waitFor:
       - "-"
 
-  # Build and Deploy Next.js App in a single step
+  # Build the Next.js container image, passing secrets
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "build-next-app-image"
+    args:
+      - "builds"
+      - "submit"
+      - "--tag"
+      - "gcr.io/$PROJECT_ID/veredicto-v2:$COMMIT_SHA"
+      - "."
+    secretEnv: ["GEMINI_API_KEY",'NEXT_PUBLIC_BASE_URL', 'MONGO_URI', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL']
+    waitFor:
+      - "deploy-function"
+
+  # Deploy the pre-built image to Cloud Run
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "deploy-next-app"
     entrypoint: "gcloud"
@@ -30,16 +43,15 @@ steps:
       - "run"
       - "deploy"
       - "veredicto-v2"
-      - "--source"
-      - "."
+      - "--image"
+      - "gcr.io/$PROJECT_ID/veredicto-v2:$COMMIT_SHA"
       - "--region"
       - "us-east1"
       - "--allow-unauthenticated"
       - "--project"
       - "$PROJECT_ID"
-    secretEnv: ["GEMINI_API_KEY",'NEXT_PUBLIC_BASE_URL', 'MONGO_URI', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL']
     waitFor:
-      - "-"
+      - "build-next-app-image"
 
 options:
   logging: CLOUD_LOGGING_ONLY
