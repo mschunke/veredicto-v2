@@ -1,24 +1,24 @@
 steps:
   # Install dependencies for the Next.js app using Node.js 20
-  - name: 'node:20'
-    id: 'npm-install'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - 'npm ci'
-    waitFor:
-      - "-" # Assuming this is now the first step for the app
+  # - name: 'node:20'
+  #   id: 'npm-install'
+  #   entrypoint: 'bash'
+  #   args:
+  #     - '-c'
+  #     - 'npm ci'
+  #   waitFor:
+  #     - "-" # Assuming this is now the first step for the app
 
   # Build the Next.js app with secrets using Node.js 20
-  - name: 'node:20'
-    id: 'npm-build'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - 'npm run build'
-    secretEnv: ["GEMINI_API_KEY",'NEXT_PUBLIC_BASE_URL', 'MONGO_URI', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL']
-    waitFor:
-      - 'npm-install'
+  # - name: 'node:20'
+  #   id: 'npm-build'
+  #   entrypoint: 'bash'
+  #   args:
+  #     - '-c'
+  #     - 'npm run build'
+  #   secretEnv: ["GEMINI_API_KEY",'NEXT_PUBLIC_BASE_URL', 'MONGO_URI', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL']
+  #   waitFor:
+  #     - 'npm-install'
 
   # Build the Docker image using the pre-built artifacts
   - name: 'gcr.io/cloud-builders/docker'
@@ -26,12 +26,30 @@ steps:
     secretEnv: ["GEMINI_API_KEY",'NEXT_PUBLIC_BASE_URL', 'MONGO_URI', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL']
     args: [
       'build',
+      '-e',
+      'GEMINI_API_KEY=$GEMINI_API_KEY',
+      '-e',
+      'NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL',
+      '-e',
+      'MONGO_URI=$MONGO_URI',
+      '-e',
+      'STRIPE_SECRET=$STRIPE_SECRET',
+      '-e',
+      'STRIPE_WH_SECRET=$STRIPE_WH_SECRET',
+      '-e',
+      'NEXT_PUBLIC_STRIPE_PK=$NEXT_PUBLIC_STRIPE_PK',
+      '-e',
+      'BREVO_API_KEY=$BREVO_API_KEY',
+      '-e',
+      'BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET',
+      '-e',
+      'BETTER_AUTH_URL=$BETTER_AUTH_URL',
       '-t',
       'gcr.io/$PROJECT_ID/veredicto-v2:$COMMIT_SHA',
       '.'
     ]
     waitFor:
-      - 'npm-build'
+      - '-'
 
   # Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
