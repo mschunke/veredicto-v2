@@ -22,7 +22,7 @@ steps:
     waitFor:
       - "-"
 
-  # Build the Next.js container image, passing secrets
+  # Build the Next.js container image, passing build-time secrets
   - name: "gcr.io/cloud-builders/gcloud"
     id: "build-next-app-image"
     args:
@@ -31,13 +31,11 @@ steps:
       - "--tag"
       - "gcr.io/$PROJECT_ID/veredicto-v2:$COMMIT_SHA"
       - "."
-      - "--set-secrets"
-      - "GEMINI_API_KEY=GEMINI_API_KEY:latest,NEXT_PUBLIC_BASE_URL=NEXT_PUBLIC_BASE_URL:latest,MONGO_URI=MONGO_URI:latest,STRIPE_SECRET=STRIPE_SECRET:latest,STRIPE_WH_SECRET=STRIPE_WH_SECRET:latest,NEXT_PUBLIC_STRIPE_PK=NEXT_PUBLIC_STRIPE_PK:latest,BREVO_API_KEY=BREVO_API_KEY:latest,BETTER_AUTH_SECRET=BETTER_AUTH_SECRET:latest,BETTER_AUTH_URL=BETTER_AUTH_URL:latest"
     secretEnv: ["GEMINI_API_KEY",'NEXT_PUBLIC_BASE_URL', 'MONGO_URI', 'STRIPE_SECRET', 'STRIPE_WH_SECRET', 'NEXT_PUBLIC_STRIPE_PK', 'BREVO_API_KEY', 'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL']
     waitFor:
       - "deploy-function"
 
-  # Deploy the pre-built image to Cloud Run, attaching runtime secrets
+  # Deploy the pre-built image to Cloud Run, attaching run-time secrets
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "deploy-next-app"
     entrypoint: "gcloud"
